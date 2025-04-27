@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Lecture Player - V.K.S.B Production</title>
   <style>
     body {
@@ -18,7 +19,7 @@
     }
     h2 {
       color: #00e5ff;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       text-shadow: 0 0 10px #00e5ff;
     }
     h3 {
@@ -33,12 +34,12 @@
       border: none;
       border-radius: 12px;
       box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+      margin-bottom: 20px;
     }
     .buttons {
-      margin-top: 25px;
       display: flex;
-      gap: 15px;
       flex-wrap: wrap;
+      gap: 15px;
       justify-content: center;
     }
     .btn {
@@ -61,17 +62,17 @@
 <body>
 
   <h2>Now Playing: Lecture</h2>
-  <h3><marquee>You must on landscape mode, reading mode for your health</marquee></h3>
-
+  <h3><marquee>You must use landscape mode. Reading mode is recommended for your eyes!</marquee></h3>
+  
   <iframe id="videoPlayer" src="" allow="autoplay" allowfullscreen></iframe>
 
   <div class="buttons">
     <a id="downloadBtn" class="btn" target="_blank">Save to Gallery</a>
+    <button class="btn" onclick="playNext()">Next Lecture</button>
     <button class="btn" onclick="shareOptions()">Share</button>
-    <button class="btn" onclick="playNextLecture()">Next Lecture</button>
   </div>
 
-  <!-- Firebase Compat -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
@@ -92,24 +93,26 @@
     const docId = urlParams.get("id");
     const category = urlParams.get("category");
 
-    let nextId = null;
+    let playlist = [];
+    let currentIndex = 0;
 
-    if (docId && category) {
-      db.collection(category).doc(docId).get().then((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          const videoId = data.videoId;
-          nextId = data.nextId || null;
+    function loadVideo(index) {
+      const currentVideo = playlist[index];
+      if (currentVideo) {
+        document.getElementById("videoPlayer").src = `https://drive.google.com/file/d/${currentVideo.videoId}/preview`;
+        document.getElementById("downloadBtn").href = `https://drive.google.com/uc?export=download&id=${currentVideo.videoId}`;
+      } else {
+        alert("All Lectures Finished!");
+      }
+    }
 
-          document.getElementById("videoPlayer").src = `https://drive.google.com/file/d/${videoId}/preview`;
-          document.getElementById("downloadBtn").href = `https://drive.google.com/uc?export=download&id=${videoId}`;
-
-          // Start auto-play timer
-          startAutoPlayTimer();
-        } else {
-          alert("Video not found");
-        }
-      });
+    function playNext() {
+      currentIndex++;
+      if (currentIndex < playlist.length) {
+        loadVideo(currentIndex);
+      } else {
+        alert("All Lectures Finished!");
+      }
     }
 
     function shareOptions() {
@@ -126,21 +129,30 @@
       }
     }
 
-    function playNextLecture() {
-      if (nextId && category) {
-        window.location.href = `player.html?id=${nextId}&category=${category}`;
-      } else {
-        alert("No next lecture linked!");
-      }
-    }
+    if (category) {
+      db.collection(category)
+        .orderBy(firebase.firestore.FieldPath.documentId())  // ID ke order me lekar aa rahe
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.videoId) {
+              playlist.push({ id: doc.id, videoId: data.videoId });
+            }
+          });
 
-    function startAutoPlayTimer() {
-      // Estimate time after 5 minutes auto move (you can adjust time)
-      setTimeout(() => {
-        if (nextId) {
-          playNextLecture();
-        }
-      }, 5 * 60 * 1000); // 5 minutes = 300,000 ms
+          if (docId) {
+            const startIndex = playlist.findIndex(item => item.id === docId);
+            if (startIndex !== -1) {
+              currentIndex = startIndex;
+              loadVideo(currentIndex);
+            } else {
+              loadVideo(0);
+            }
+          } else {
+            loadVideo(0);
+          }
+        });
     }
   </script>
 
