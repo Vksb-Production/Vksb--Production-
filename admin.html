@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel – V.K.S.B Production</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      margin: 0;
+      padding: 0;
+    }
+    .admin-panel {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      text-align: center;
+      color: #0072ff;
+      margin-bottom: 30px;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      background-color: #0072ff;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-top: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005ecb;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-panel">
+    <h1>V.K.S.B Production</h1>
+
+    <label for="title">Lecture Title:</label>
+    <input type="text" id="title" placeholder="Enter lecture title">
+
+    <label for="link">Lecture Link (Google Drive):</label>
+    <input type="text" id="link" placeholder="Enter Drive link">
+
+    <label for="subject">Subject:</label>
+    <input type="text" id="subject" placeholder="e.g. Science, SST, English, Hindi, Maths">
+
+    <label for="category">Category:</label>
+    <select id="category">
+      <option value="lectures">Lecture</option>
+      <option value="notes">Notes</option>
+      <option value="dpp">DPP</option>
+      <option value="notices">Notice</option>
+    </select>
+
+    <button onclick="uploadLecture()">Upload</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMLHk9G2Usjhy5SY44ekAxGbdbw0V1dSA",
+      authDomain: "vksb--production.firebaseapp.com",
+      projectId: "vksb--production",
+      storageBucket: "vksb--production.appspot.com",
+      messagingSenderId: "489620312891",
+      appId: "1:489620312891:web:83915decec1475bb4bdd1e"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function extractDriveId(link) {
+  let match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) {
+    return match[1];
+  }
+  match = link.match(/id=([a-zA-Z0-9_-]+)/);
+  return match ? match[1] : null;
+}
+
+    function uploadLecture() {
+      const title = document.getElementById("title").value.trim();
+      const link = document.getElementById("link").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const category = document.getElementById("category").value;
+
+      const videoId = extractDriveId(link);
+
+      if (title && link && subject && category && videoId) {
+        db.collection(category).add({
+          title: title,
+          link: link,
+          subject: subject,
+          videoId: videoId,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("Uploaded successfully!");
+          document.getElementById("title").value = "";
+          document.getElementById("link").value = "";
+          document.getElementById("subject").value = "";
+        }).catch((error) => {
+          console.error("Error adding document: ", error);
+        });
+      } else {
+        alert("Please fill all fields and make sure the Drive link is valid.");
+      }
+    }
+  </script>
+</body>
+</html>

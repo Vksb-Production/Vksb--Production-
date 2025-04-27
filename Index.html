@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>V.K.S.B Production - Login</title>
+  <style>
+    body {
+      background: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 250px;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #00c853;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00b347;
+    }
+
+    #message {
+      margin-top: 15px;
+      color: #ff5252;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Login / Register</h2>
+
+  <input type="email" id="email" placeholder="Email" /><br>
+  <input type="password" id="password" placeholder="Password" /><br>
+
+  <button onclick="register()">Register</button>
+  <button onclick="login()">Login</button>
+
+  <p id="message"></p>
+
+  <script type="module" src="./app.js"></script>
+
+  <!-- Auto-login script -->
+  <script type="module">
+    import { auth } from './firebase.js';
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Already logged in, redirect
+        window.location.href = "dashboard.html";
+      }
+    });
+  </script>
+
+</body>
+</html>

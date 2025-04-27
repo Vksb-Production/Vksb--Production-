@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DPPs - V.K.S.B Production</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 10;
+      padding: 10px;
+    }
+
+    header {
+      background-color: #1f1f1f;
+      color: #00e5ff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px #00000066;
+    }
+
+    .dpp-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .dpp-box {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 20px;
+      width: 300px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s;
+    }
+
+    .dpp-box:hover {
+      transform: translateY(-5px);
+    }
+
+    .dpp-box h3 {
+      color: #ffcc00;
+    }
+
+    .dpp-box p {
+      color: #cccccc;
+    }
+
+    .dpp-box a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 15px;
+      background-color: #00e5ff;
+      color: #000;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .dpp-box a:hover {
+      background-color: #00bcd4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>All DPPs</header>
+
+  <div class="dpp-container" id="dppList">Loading...</div>
+
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMLHk9G2Usjhy5SY44ekAxGbdbw0V1dSA",
+      authDomain: "vksb--production.firebaseapp.com",
+      projectId: "vksb--production",
+      storageBucket: "vksb--production.appspot.com",
+      messagingSenderId: "489620312891",
+      appId: "1:489620312891:web:83915decec1475bb4bdd1e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    db.collection("dpp").orderBy("timestamp", "desc").get()
+      .then((querySnapshot) => {
+        let output = "";
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          output += `
+            <div class="dpp-box">
+              <h3>${data.title}</h3>
+              <p><strong>Subject:</strong> ${data.subject || 'Not specified'}</p>
+              <a href="${data.link}" target="_blank">Open DPP</a>
+            </div>
+          `;
+        });
+        document.getElementById("dppList").innerHTML = output || "No DPPs available.";
+      })
+      .catch((error) => {
+        console.error("Error getting documents:", error);
+        document.getElementById("dppList").innerHTML = "Failed to load DPPs.";
+      });
+  </script>
+
+</body>
+</html>

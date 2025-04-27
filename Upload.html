@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Lecture</title>
+
+  <!-- Step 1: Add Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+  <h2>Upload Video</h2>
+  <input type="text" id="title" placeholder="Enter title"><br><br>
+  <input type="text" id="videoId" placeholder="Enter Google Drive Video ID"><br><br>
+  <button onclick="uploadData()">Upload</button>
+
+  <!-- Step 2: Link upload.js -->
+  <script src="upload.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>V.K.S.B Production - Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: #ffffff;
+    }
+
+    header {
+      background-color: #1f1f1f;
+      color: #00e5ff;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px #00000066;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      padding: 30px;
+    }
+
+    .card {
+      background-color: #1f1f1f;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+
+    .card a {
+      text-decoration: none;
+      color: #00e5ff;
+      font-size: 20px;
+      font-weight: bold;
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #ffffff10;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+
+    .card a:hover {
+      background-color: #00bcd4;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  Welcome to V.K.S.B Production
+</header>
+
+<div class="container">
+  <div class="card">
+    <a href="lectures.html">Lectures</a>
+  </div>
+  <div class="card">
+    <a href="notes.html">Notes</a>
+  </div>
+  <div class="card">
+    <a href="DPP.html">DPP</a>
+  </div>
+  <div class="card">
+    <a href="Notices.html">Notices</a>
+  </div>
+</div>
+
+</body>
+</html>
