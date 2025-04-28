@@ -17,16 +17,13 @@
       padding: 20px;
       text-align: center;
     }
-    h2 {
-      color: #00e5ff;
-      margin-bottom: 10px;
-      text-shadow: 0 0 10px #00e5ff;
-    }
-    h3 {
+
+    h2, h3 {
       color: #00e5ff;
       margin-bottom: 20px;
       text-shadow: 0 0 10px #00e5ff;
     }
+
     iframe {
       width: 95%;
       max-width: 900px;
@@ -34,14 +31,16 @@
       border: none;
       border-radius: 12px;
       box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
-      margin-bottom: 20px;
     }
+
     .buttons {
+      margin-top: 25px;
       display: flex;
-      flex-wrap: wrap;
       gap: 15px;
+      flex-wrap: wrap;
       justify-content: center;
     }
+
     .btn {
       background-color: #00e5ff;
       color: #000;
@@ -54,25 +53,28 @@
       transition: background-color 0.3s ease;
       text-decoration: none;
     }
+
     .btn:hover {
       background-color: #00bcd4;
     }
   </style>
 </head>
+
 <body>
 
   <h2>Now Playing: Lecture</h2>
-  <h3><marquee>You must use landscape mode. Reading mode is recommended for your eyes!</marquee></h3>
-  
+  <h3><marquee>You must enable landscape mode & reading mode for better health</marquee></h3>
+
   <iframe id="videoPlayer" src="" allow="autoplay" allowfullscreen></iframe>
 
   <div class="buttons">
     <a id="downloadBtn" class="btn" target="_blank">Save to Gallery</a>
-    <button class="btn" onclick="playNext()">Next Lecture</button>
-    <button class="btn" onclick="shareOptions()">Share</button>
+    <button id="nextLectureBtn" class="btn">Next Lecture</button>
+    <a id="whatsappShareBtn" class="btn" target="_blank">Share on WhatsApp</a>
+    <a id="telegramShareBtn" class="btn" target="_blank">Share on Telegram</a>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
@@ -93,67 +95,45 @@
     const docId = urlParams.get("id");
     const category = urlParams.get("category");
 
-    let playlist = [];
-    let currentIndex = 0;
+    let lectures = [];
+    let currentIndex = -1;
 
-    function loadVideo(index) {
-      const currentVideo = playlist[index];
-      if (currentVideo) {
-        document.getElementById("videoPlayer").src = `https://drive.google.com/file/d/${currentVideo.videoId}/preview`;
-        document.getElementById("downloadBtn").href = `https://drive.google.com/uc?export=download&id=${currentVideo.videoId}`;
-      } else {
-        alert("All Lectures Finished!");
-      }
-    }
-
-    function playNext() {
-      currentIndex++;
-      if (currentIndex < playlist.length) {
-        loadVideo(currentIndex);
-      } else {
-        alert("All Lectures Finished!");
-      }
-    }
-
-    function shareOptions() {
-      const videoLink = window.location.href;
-      const encodedText = encodeURIComponent("Watch this lecture:\n" + videoLink);
-      const whatsappURL = `https://wa.me/?text=${encodedText}`;
-      const telegramURL = `https://t.me/share/url?url=${videoLink}&text=Watch this lecture`;
-
-      const choice = confirm("Click OK to share on WhatsApp, Cancel for Telegram");
-      if (choice) {
-        window.open(whatsappURL, "_blank");
-      } else {
-        window.open(telegramURL, "_blank");
-      }
-    }
-
-    if (category) {
-      db.collection(category)
-        .orderBy(firebase.firestore.FieldPath.documentId())  // ID ke order me lekar aa rahe
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            if (data.videoId) {
-              playlist.push({ id: doc.id, videoId: data.videoId });
-            }
-          });
-
-          if (docId) {
-            const startIndex = playlist.findIndex(item => item.id === docId);
-            if (startIndex !== -1) {
-              currentIndex = startIndex;
-              loadVideo(currentIndex);
-            } else {
-              loadVideo(0);
-            }
-          } else {
-            loadVideo(0);
-          }
+    if (docId && category) {
+      db.collection(category).orderBy('timestamp', 'asc').get().then(snapshot => {
+        snapshot.forEach(doc => {
+          lectures.push({ id: doc.id, ...doc.data() });
         });
+
+        currentIndex = lectures.findIndex(lec => lec.id === docId);
+
+        if (currentIndex !== -1) {
+          loadLecture(currentIndex);
+        } else {
+          alert("Lecture not found");
+        }
+      });
     }
+
+    function loadLecture(index) {
+      const lecture = lectures[index];
+      document.getElementById("videoPlayer").src = `https://drive.google.com/file/d/${lecture.videoId}/preview`;
+      document.getElementById("downloadBtn").href = `https://drive.google.com/uc?export=download&id=${lecture.videoId}`;
+
+      const videoLink = window.location.origin + window.location.pathname + `?id=${lecture.id}&category=${category}`;
+      const encodedText = encodeURIComponent("Watch this lecture:\n" + videoLink);
+
+      document.getElementById("whatsappShareBtn").href = `https://wa.me/?text=${encodedText}`;
+      document.getElementById("telegramShareBtn").href = `https://t.me/share/url?url=${videoLink}&text=Watch this lecture`;
+    }
+
+    document.getElementById("nextLectureBtn").addEventListener("click", () => {
+      if (currentIndex < lectures.length - 1) {
+        currentIndex++;
+        loadLecture(currentIndex);
+      } else {
+        alert("All lectures finished");
+      }
+    });
   </script>
 
 </body>
